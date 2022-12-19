@@ -1,0 +1,27 @@
+[
+  
+    {
+      "title"    : "Librosasassa",
+      "title-lower"    : "librosasassa",
+      "sub-titile" : "",
+      "sub-titile-lower" : "",
+      "categories" : "JavascriptNodeJS",
+      "tags"     : "",
+      "url"      : "/javascript/nodejs/2020/03/24/librosa.html",
+      "date"     : "2020-03-24 00:33:36 +0900",
+      "content"     : "이 글은 과거 제 블로그에서 그대로 퍼온 글입니다.이번 포스팅에서는 지난 포스팅에 이어, 실제로 파이썬을 이용해 어떻게 음성 데이터를 불러오고 가공하는지에 대해 알아보겠습니다.Librosa 라이브러리 만든이 칭찬해~~파이썬은 배워두면 참 쓸모가 많은 언어인 것 같습니다. 찾아보면 라이브러리가 다 있으니까요. Librosa 라이브러리는 음성 데이터를 다..."
+    } ,
+  
+    {
+      "title"    : "Integrating razorpay into your webapp",
+      "title-lower"    : "integrating razorpay into your webapp",
+      "sub-titile" : "",
+      "sub-titile-lower" : "",
+      "categories" : "JavascriptNodeJS",
+      "tags"     : "",
+      "url"      : "/javascript/nodejs/2019/03/24/welcome-to-jekyll.html",
+      "date"     : "2019-03-24 00:33:36 +0900",
+      "content"     : "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ..."
+    } 
+  
+]
