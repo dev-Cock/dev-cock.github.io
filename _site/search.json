@@ -1,15 +1,51 @@
 [
   
     {
-      "title"    : "Librosasassa",
-      "title-lower"    : "librosasassa",
+      "title"    : "Python 음성데이터 분석 - MFCC (Mel Frequency Cepstral Coefficient)",
+      "title-lower"    : "python 음성데이터 분석 - mfcc (mel frequency cepstral coefficient)",
       "sub-titile" : "",
       "sub-titile-lower" : "",
-      "categories" : "JavascriptNodeJS",
+      "categories" : "TimeSeriesLibrosaAudioData",
       "tags"     : "",
-      "url"      : "/javascript/nodejs/2020/03/24/librosa.html",
-      "date"     : "2020-03-24 00:33:36 +0900",
-      "content"     : "이 글은 과거 제 블로그에서 그대로 퍼온 글입니다.이번 포스팅에서는 지난 포스팅에 이어, 실제로 파이썬을 이용해 어떻게 음성 데이터를 불러오고 가공하는지에 대해 알아보겠습니다.Librosa 라이브러리 만든이 칭찬해~~파이썬은 배워두면 참 쓸모가 많은 언어인 것 같습니다. 찾아보면 라이브러리가 다 있으니까요. Librosa 라이브러리는 음성 데이터를 다..."
+      "url"      : "/timeseries/librosa/audiodata/2022/12/20/librosa4.html",
+      "date"     : "2022-12-20 04:00:00 +0900",
+      "content"     : "지난 포스팅까지 소리의 특징부터 주파수 분석 및 Mel Scale까지 다양하게 살펴봤습니다. 이번 포스팅에서는 특히나 음성 분석에 많이 쓰이는 Mel Frequency Cepstral Coefficient에 대해 알아보겠습니다. 혹시나 잘못된 부분이 있으면 댓글 달아주시면 감사하겠습니다.MFCC (Mel Frequency Cepstral Coeffic..."
+    } ,
+  
+    {
+      "title"    : "Python 음성데이터 분석 - Mel Spectrogram",
+      "title-lower"    : "python 음성데이터 분석 - mel spectrogram",
+      "sub-titile" : "",
+      "sub-titile-lower" : "",
+      "categories" : "TimeSeriesLibrosaAudioData",
+      "tags"     : "",
+      "url"      : "/timeseries/librosa/audiodata/2022/12/20/librosa3.html",
+      "date"     : "2022-12-20 03:40:00 +0900",
+      "content"     : "지난 포스팅까지 Librosa 라이브러리의 short time fourier frequency에 대한 이론 및 방법에 대해 알아봤습니다. 이번에는 더 나아가, 음성데이터 분석에 주로 쓰이는 mel spectrogram에 대해 다뤄보겠습니다. 공부한 내용을 바탕으로 작성하기 때문에, 혹시나 잘못된 내용이 있으면 알려주시면 감사하겠습니다.Mel-Spect..."
+    } ,
+  
+    {
+      "title"    : "Python 음성데이터 분석 - Librosa 라이브러리를 활용한 주파수 분석",
+      "title-lower"    : "python 음성데이터 분석 - librosa 라이브러리를 활용한 주파수 분석",
+      "sub-titile" : "",
+      "sub-titile-lower" : "",
+      "categories" : "TimeSeriesLibrosaAudioData",
+      "tags"     : "",
+      "url"      : "/timeseries/librosa/audiodata/2022/12/19/librosa2.html",
+      "date"     : "2022-12-19 03:40:00 +0900",
+      "content"     : "이번 포스팅에서는 지난 포스팅에 이어, 실제로 파이썬을 이용해 어떻게 음성 데이터를 불러오고 가공하는지에 대해 알아보겠습니다.파이썬은 배워두면 참 쓸모가 많은 언어인 것 같습니다. 찾아보면 어지간한 라이브러리가 다 있으니까요. Librosa 라이브러리는 음성 데이터를 다루는 대표적인 라이브러리입니다. 간단하게 wav파일을 불러와서 파형을 직접 가공할 ..."
+    } ,
+  
+    {
+      "title"    : "Python 음성데이터 분석 - 음성 데이터 형태",
+      "title-lower"    : "python 음성데이터 분석 - 음성 데이터 형태",
+      "sub-titile" : "",
+      "sub-titile-lower" : "",
+      "categories" : "TimeSeriesLibrosaAudioData",
+      "tags"     : "",
+      "url"      : "/timeseries/librosa/audiodata/2022/12/18/librosa1.html",
+      "date"     : "2022-12-18 03:40:00 +0900",
+      "content"     : "시작하기에 앞서…본 포스팅은 과거에 운영하던 블로그에서 일부 수정하여 발췌해왔음을 서두에 밝힙니다.이번에는 음성 데이터를 분석하는 방법에 대해 다뤄보겠습니다. 아직 공부중이긴 합니다만, 지금까지 진행한 내역들에 대해 초심자의 마음으로 서술하고자 합니다. 혹시 잘못된 내용이 있으면 댓글로 알려주시면 감사하겠습니다.음성, 소리의 형태우리가 듣는 소리는 진..."
     } ,
   
     {
