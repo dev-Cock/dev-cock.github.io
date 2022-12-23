@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link href="https://fonts.googleapis.com/css?family=Merriweather:300|Raleway:400,700" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/style.css">
+<title>Python 음성데이터 분석 - Librosa 라이브러리 사용법 총정리</title>
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Python 음성데이터 분석 - Librosa 라이브러리 사용법 총정리 | Developer Cock’s Garage</title>
+<meta name="generator" content="Jekyll v4.3.1" />
+<meta property="og:title" content="Python 음성데이터 분석 - Librosa 라이브러리 사용법 총정리" />
+<meta name="author" content="devCock" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="지난 포스팅까지 파이썬을 활용하여 음성 데이터를 분석하는 전반적인 단계들에 대해 다뤘습니다. 중간중간 Librosa 패키지를 사용하는 방법에 대해서도 설명했습니다만, 아무래도 한 포스팅에서 모아서 요약해놓는 것이 좋을 것 같네요. 총정리라기보다는, 제가 주로 사용했던 메소드들을 정리해봤습니다." />
+<meta property="og:description" content="지난 포스팅까지 파이썬을 활용하여 음성 데이터를 분석하는 전반적인 단계들에 대해 다뤘습니다. 중간중간 Librosa 패키지를 사용하는 방법에 대해서도 설명했습니다만, 아무래도 한 포스팅에서 모아서 요약해놓는 것이 좋을 것 같네요. 총정리라기보다는, 제가 주로 사용했던 메소드들을 정리해봤습니다." />
+<link rel="canonical" href="http://localhost:4000/timeseries/librosa/audiodata/2022/12/20/librosa5.html" />
+<meta property="og:url" content="http://localhost:4000/timeseries/librosa/audiodata/2022/12/20/librosa5.html" />
+<meta property="og:site_name" content="Developer Cock’s Garage" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-12-20T04:20:00+09:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Python 음성데이터 분석 - Librosa 라이브러리 사용법 총정리" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"devCock"},"dateModified":"2022-12-20T04:20:00+09:00","datePublished":"2022-12-20T04:20:00+09:00","description":"지난 포스팅까지 파이썬을 활용하여 음성 데이터를 분석하는 전반적인 단계들에 대해 다뤘습니다. 중간중간 Librosa 패키지를 사용하는 방법에 대해서도 설명했습니다만, 아무래도 한 포스팅에서 모아서 요약해놓는 것이 좋을 것 같네요. 총정리라기보다는, 제가 주로 사용했던 메소드들을 정리해봤습니다.","headline":"Python 음성데이터 분석 - Librosa 라이브러리 사용법 총정리","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/timeseries/librosa/audiodata/2022/12/20/librosa5.html"},"url":"http://localhost:4000/timeseries/librosa/audiodata/2022/12/20/librosa5.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+<script type="text/javascript" src="/assets/js/darkmode.js"></script>
+
+</head><body>
+  <main class="container">
+    <section class="about">
+      <div class="about-header condensed">
+      <div class="about-title">
+      <a href="/">
+        
+        <img src="/assets/portfolio.png" alt="Dev Cock" />
+        
+      </a>
+      <h2 id="title">
+        <a href="/">Dev Cock</a>
+      </h2>
+      </div><p class="tagline">C.S Garage</p></div>
+      
+      <ul class="social about-footer condensed"><a href="https://github.com/samarsault" target="_blank">
+          <li>
+            <i class="icon-github-circled"></i>
+          </li>
+        </a><a href="https://www.linkedin.com/in/samarsault" target="_blank">
+          <li>
+            <i class="icon-linkedin-squared"></i>
+          </li>
+        </a><a href="https://twitter.com/samarsault" target="_blank">
+          <li>
+            <i class="icon-twitter-squared"></i>
+          </li>
+        </a></ul><p class="about-footer condensed">&copy;
+        2022</p><div class="about-footer condensed">
+        <p>Dark Mode
+          <i class="icon-moon"></i>
+          <label class="switch">
+            <input type="checkbox" class="dark-mode-toggle">
+            <span class="slider round" onclick="toggleDarkMode()"></span>
+          </label>
+        </p>
+      </div>
+    </section>
+    <section class="content">
+      <div class="post-container">
+  <a class="post-link" href="/timeseries/librosa/audiodata/2022/12/20/librosa5.html">
+    <h2 class="post-title">Python 음성데이터 분석 - Librosa 라이브러리 사용법 총정리</h2>
+  </a>
+  <div class="post-meta">
+    <div class="post-date"><i class="icon-calendar"></i>Dec 20, 2022</div><ul class="post-categories"><li>TimeSeries</li><li>Librosa</li><li>AudioData</li></ul></div>
+  <div class="post">
+    <p>지난 포스팅까지 파이썬을 활용하여 음성 데이터를 분석하는 전반적인 단계들에 대해 다뤘습니다. 중간중간 <code class="language-plaintext highlighter-rouge">Librosa</code> 패키지를 사용하는 방법에 대해서도 설명했습니다만, 아무래도 한 포스팅에서 모아서 요약해놓는 것이 좋을 것 같네요. 총정리라기보다는, 제가 주로 사용했던 메소드들을 정리해봤습니다.</p>
+
+<h2 id="librosa-라이브러리">Librosa 라이브러리</h2>
+
+<p>Python에서 음원 데이터를 분석해주는 아주 고마운 라이브러리입니다. <code class="language-plaintext highlighter-rouge">short time fourier transform</code>이나 <code class="language-plaintext highlighter-rouge">mel spectrogram</code>, <code class="language-plaintext highlighter-rouge">mfcc</code> 등 흔히들 사용하는 기능들을 모두 제공하고 있습니다.</p>
+
+<h2 id="라이브러리-설치-및-import">라이브러리 설치 및 import</h2>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip install librosa
+import librosa
+</code></pre></div></div>
+<hr />
+
+<h2 id="음원-데이터-불러오기">음원 데이터 불러오기</h2>
+
+<p>아래와 같이 간단하게 wav파일을 불러올 수 있습니다.</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">y</code>: 음원의 파형 데이터</li>
+  <li><code class="language-plaintext highlighter-rouge">sr</code>: sampling rate (주파수 분석 및 파형의 시간 간격을 결정)</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">audio_path</span> <span class="o">=</span> <span class="s">'fileName.wav'</span>
+<span class="n">y</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="n">librosa</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="n">audio_path</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="stft-short-time-fourier-transform">STFT (Short Time Fourier Transform)</h2>
+
+<p>Time 도메인의 파형을 Frequency 도메인으로 변형시키는 푸리에 변환입니다. 이 때, 전체 파형을 대상으로 하면 제대로 된 주파수 분석을 할 수 없기 때문에, 짧은 시간 단위로 분리해서 각각의 구간에 대해 변환을 합니다.</p>
+
+<p>설정하는 파라미터가 다양한데, 상세 설명은 이전 <a href="https://dev-cock.tistory.com/5">STFT 포스팅</a>에서 확인하실 수 있습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">stft_result</span> <span class="o">=</span> <span class="n">librosa</span><span class="p">.</span><span class="n">stft</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">n_fft</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span> <span class="n">win_length</span> <span class="o">=</span> <span class="mi">4096</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+<span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">abs</span><span class="p">(</span><span class="n">stft_result</span><span class="p">)</span>
+<span class="n">S_dB</span> <span class="o">=</span> <span class="n">librosa</span><span class="p">.</span><span class="n">power_to_db</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">ref</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="nb">max</span><span class="p">)</span>
+<span class="n">librosa</span><span class="p">.</span><span class="n">display</span><span class="p">.</span><span class="n">specshow</span><span class="p">(</span><span class="n">S_dB</span><span class="p">,</span> <span class="n">sr</span><span class="o">=</span><span class="n">sr</span><span class="p">,</span> <span class="n">hop_length</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">,</span> <span class="n">y_axis</span><span class="o">=</span><span class="s">'mel'</span><span class="p">,</span> <span class="n">x_axis</span><span class="o">=</span><span class="s">'time'</span><span class="p">,</span> <span class="n">cmap</span> <span class="o">=</span> <span class="n">cm</span><span class="p">.</span><span class="n">jet</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">colorbar</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s">'%2.0f dB'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h2 id="mel-spectrogram-생성">Mel Spectrogram 생성</h2>
+
+<p>Mel Scale 변환을 통해 사람의 귀에 맞춰진(?) 스펙트로그램을 생성합니다. STFT로 나온 결과는 수치적으로는 객관적이지만, 실제 사람의 귀의 입장에서는 그렇지 않기 때문에 Mel Spectrogram을 사용합니다.</p>
+
+<p>파라미터는 <code class="language-plaintext highlighter-rouge">STFT</code>와 유사하며, <code class="language-plaintext highlighter-rouge">n_mels</code>를 통해 주파수 해상도를 결정합니다. <a href="https://hyongdoc.tistory.com/6">관련 포스팅</a> 참고.<br />
+반드시 아래와 같이 할 필요는 없고, 파형 원본 데이터인 <code class="language-plaintext highlighter-rouge">y</code>에서 바로 생성도 가능합니다. 파라미터들만 잘 설정해주면 됩니다.</p>
+
+<hr />
+
+<p>|   1  2  3  4  5     |   D = np.abs(librosa.stft(y, n_fft=n_fft, win_length = win_length, hop_length=hop_length))  mel_spec = librosa.feature.melspectrogram(S=D, sr=sr, n_mels=n_mels, hop_length=hop_length, win_length=win_length)  librosa.display.specshow(librosa.amplitude_to_db(mel_spec, ref=0.00002), sr=sr, hop_length = hop_length, y_axis=‘mel’, x_axis=‘time’, cmap = cm.jet)  plt.colorbar(format=‘%2.0f dB’)  plt.show()  <a href="http://colorscripter.com/info#e">Colored by Color Scripter</a>   | <a href="http://colorscripter.com/info#e">cs</a> |
+| — | — | — |</p>
+
+<hr />
+
+<h2 id="mfcc-생성-mel-frequency-cepstral-coefficient">MFCC 생성 (Mel Frequency Cepstral Coefficient)</h2>
+
+<p>MFCC는 Mel spectrogram에 DCT를 거쳐서 나온 결과값입니다. 스펙트로그램 대비 압축된 정보를 담고 있다고 볼 수 있으며, 압축하는 과정에서 손실이 발생, 노이즈가 제거되는 효과가 있습니다. 이 때문에 MFCC 값이 고유의 음성 정보를 담고 있다고 보기도 하는 것 같습니다. 주로 음성 데이터 분석을 할 때도 MFCC로 하는 것으로 알고 있습니다. 역변환을 하면 원본 파형데이터인 <code class="language-plaintext highlighter-rouge">y</code>의 형태로도 연산이 가능하기 때문입니다.</p>
+
+<p>파라미터는 <code class="language-plaintext highlighter-rouge">n_mfcc</code>가 있으며, 압축을 얼마나 할지에 대한 것입니다. 크면 클수록 스펙트로그램의 값을 더 잘 담아내며, 작을수록 손실이 많이 발생합니다. <a href="https://dev-cock.tistory.com/7">관련 포스팅</a> 참고.</p>
+
+<hr />
+
+<p>|   1  2     |   D = np.abs(librosa.stft(y, n_fft=n_fft, win_length = win_length, hop_length=hop_length))  mfcc = librosa.feature.mfcc(S=librosa.power_to_db(D), sr=sr, n_mfcc=n_mfcc)     | <a href="http://colorscripter.com/info#e">cs</a> |
+| — | — | — |</p>
+
+<hr />
+
+<h2 id="역변환-하는-방법">역변환 하는 방법</h2>
+
+<p>위에서 설명한 모든 방법은 역변환을 할 수 있습니다. 아래와 같이 Librosa에서 메소드들을 제공하며, 단계 순서에 관계없이도 역변환이 가능하기 때문에 파라미터 설정만 잘 맞춰주시면 됩니다.</p>
+
+<hr />
+
+<p>|   1  2  3  4  5     |   feature.inverse.mel_to_stft(params)  feature.inverse.mel_to_audio(params)  feature.inverse.mfcc_to_mel(params)  feature.inverse.mfcc_to_audio(params)   <a href="http://colorscripter.com/info#e">Colored by Color Scripter</a>   | <a href="http://colorscripter.com/info#e">cs</a> |
+| — | — | — |</p>
+
+<hr />
+
+<h2 id="역변환-시-다시-오디오-파형으로-그리는-방법">역변환 시 다시 오디오 파형으로 그리는 방법?</h2>
+
+<p>음원을 주파수 분석하기 위해 FFT를 하는 것을 STFT로 진행한다고 위에서 언급했습니다. 보통 푸리에 변환은 역변환이 가능하기 때문에 바로 다시 음원으로 변형도 가능합니다만, 위 예제의 경우 보시다시피 <code class="language-plaintext highlighter-rouge">np.abs()</code>, 즉 절대값을 취하는 과정을 거쳐서 스펙트로그램을 만들었기 때문에 역변환이 불가능합니다.</p>
+
+<h3 id="why">Why?</h3>
+
+<p>푸리에 변환의 결과값이 위상값을 포함한 복소수로 이루어져 있기 때문입니다. 즉, STFT의 원본 결과값을 출력해보면 복소수 형태로 위상값을 포함하고 있다는 것을 알 수 있습니다. 그런데 abs로 절대화시키는 순간, 위상 정보를 잃게 됩니다.<br />
+때문에 이런 스펙트로그램에서 파형으로 다시 가기 위해서는 위상을 만드는 과정이 필요하게 됩니다.</p>
+
+<hr />
+
+<h3 id="griffin-lim">Griffin-Lim</h3>
+
+<p>다양한 방식들이 있지만, librosa에서 <code class="language-plaintext highlighter-rouge">griffin-lim</code>이라는 방식을 제공하고 있습니다. 자세히 읽어보진 않았지만, iterative한 방식으로 위상값을 유추해내는 기법이라고 합니다. 원본 데이터의 위상과 정확히 일치하진 않더라도 이런 방식을 통해 오디오 파형으로 역변환이 가능합니다. 또 역변환된 음원과 원본 음원을 함께 들어보면 큰 차이가 나지는 않는 것 같습니다. 어차피 FFT의 결과값이 주기가 다른 sin들이기 때문이 아닐까 싶습니다. 주기가 다르기 때문에 위상이 차이가 나더라도, 그 안에서 상쇄되지는 않는 것 같습니다만! 혹시 차이가 발생하는 부분들이 있다면 댓글로 남겨주시면 감사하겠습니다.</p>
+
+  </div><div id="disqus_thread" style="margin-top:25px"></div>
+  <script>
+    var disqus_config = function () {
+      this.page.url = 'http://localhost:4000/timeseries/librosa/audiodata/2022/12/20/librosa5.html';
+      this.page.identifier = 'http://localhost:4000/timeseries/librosa/audiodata/2022/12/20/librosa5.html';
+    };
+    (function () {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://dev-cock.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments
+      powered by Disqus.</a></noscript></div>
+
+    </section>
+    <footer class="condensed">
+      <ul class="social about-footer condensed"><a href="https://github.com/samarsault" target="_blank">
+          <li>
+            <i class="icon-github-circled"></i>
+          </li>
+        </a><a href="https://www.linkedin.com/in/samarsault" target="_blank">
+          <li>
+            <i class="icon-linkedin-squared"></i>
+          </li>
+        </a><a href="https://twitter.com/samarsault" target="_blank">
+          <li>
+            <i class="icon-twitter-squared"></i>
+          </li>
+        </a></ul><p class="about-footer condensed">&copy;
+        2022</p><div class="about-footer condensed">
+        <p>Dark Mode
+          <i class="icon-moon"></i>
+          <label class="switch">
+            <input type="checkbox" class="dark-mode-toggle">
+            <span class="slider round" onclick="toggleDarkMode()"></span>
+          </label>
+        </p>
+      </div>
+    </footer>
+  </main>
+  
+  <script type="text/javascript" src="/assets/js/darkmode.js"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ET3TTH5WY7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-ET3TTH5WY7');
+  </script>
+  <script src="/assets/js/simple-jekyll-search.min.js"></script>
+  <script src="/assets/js/search.js"></script>
+  
+</body>
+
+</html>
