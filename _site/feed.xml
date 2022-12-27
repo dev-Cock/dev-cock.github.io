@@ -1,0 +1,512 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Developer Cock&apos;s Garage</title>
+    <description>Developer Cock
+</description>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Tue, 27 Dec 2022 11:27:30 +0900</pubDate>
+    <lastBuildDate>Tue, 27 Dec 2022 11:27:30 +0900</lastBuildDate>
+    <generator>Jekyll v4.3.1</generator>
+    
+      <item>
+        <title>Python 음성데이터 분석 - Librosa 라이브러리 사용법 총정리</title>
+        <description>&lt;p&gt;지난 포스팅까지 파이썬을 활용하여 음성 데이터를 분석하는 전반적인 단계들에 대해 다뤘습니다. 중간중간 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Librosa&lt;/code&gt; 패키지를 사용하는 방법에 대해서도 설명했습니다만, 아무래도 한 포스팅에서 모아서 요약해놓는 것이 좋을 것 같네요. 총정리라기보다는, 제가 주로 사용했던 메소드들을 정리해봤습니다.&lt;/p&gt;
+
+&lt;h2 id=&quot;librosa-라이브러리&quot;&gt;Librosa 라이브러리&lt;/h2&gt;
+
+&lt;p&gt;Python에서 음원 데이터를 분석해주는 아주 고마운 라이브러리입니다. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;short time fourier transform&lt;/code&gt;이나 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mel spectrogram&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mfcc&lt;/code&gt; 등 흔히들 사용하는 기능들을 모두 제공하고 있습니다.&lt;/p&gt;
+
+&lt;h2 id=&quot;라이브러리-설치-및-import&quot;&gt;라이브러리 설치 및 import&lt;/h2&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pip install librosa
+import librosa
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;hr /&gt;
+
+&lt;h2 id=&quot;음원-데이터-불러오기&quot;&gt;음원 데이터 불러오기&lt;/h2&gt;
+
+&lt;p&gt;아래와 같이 간단하게 wav파일을 불러올 수 있습니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;y&lt;/code&gt;: 음원의 파형 데이터&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sr&lt;/code&gt;: sampling rate (주파수 분석 및 파형의 시간 간격을 결정)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;audio_path&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&apos;fileName.wav&apos;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;librosa&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;audio_path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;stft-short-time-fourier-transform&quot;&gt;STFT (Short Time Fourier Transform)&lt;/h2&gt;
+
+&lt;p&gt;Time 도메인의 파형을 Frequency 도메인으로 변형시키는 푸리에 변환입니다. 이 때, 전체 파형을 대상으로 하면 제대로 된 주파수 분석을 할 수 없기 때문에, 짧은 시간 단위로 분리해서 각각의 구간에 대해 변환을 합니다.&lt;/p&gt;
+
+&lt;p&gt;설정하는 파라미터가 다양한데, 상세 설명은 이전 &lt;a href=&quot;https://dev-cock.tistory.com/5&quot;&gt;STFT 포스팅&lt;/a&gt;에서 확인하실 수 있습니다.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;stft_result&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;librosa&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stft&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n_fft&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;4096&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;win_length&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4096&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hop_length&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;512&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;D&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;abs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stft_result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;S_dB&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;librosa&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;power_to_db&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;D&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ref&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;librosa&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;specshow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S_dB&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hop_length&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1024&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y_axis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;mel&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x_axis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;time&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cmap&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;jet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;colorbar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;%2.0f dB&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;mel-spectrogram-생성&quot;&gt;Mel Spectrogram 생성&lt;/h2&gt;
+
+&lt;p&gt;Mel Scale 변환을 통해 사람의 귀에 맞춰진(?) 스펙트로그램을 생성합니다. STFT로 나온 결과는 수치적으로는 객관적이지만, 실제 사람의 귀의 입장에서는 그렇지 않기 때문에 Mel Spectrogram을 사용합니다.&lt;/p&gt;
+
+&lt;p&gt;파라미터는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;STFT&lt;/code&gt;와 유사하며, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;n_mels&lt;/code&gt;를 통해 주파수 해상도를 결정합니다. &lt;a href=&quot;https://hyongdoc.tistory.com/6&quot;&gt;관련 포스팅&lt;/a&gt; 참고.&lt;br /&gt;
+반드시 아래와 같이 할 필요는 없고, 파형 원본 데이터인 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;y&lt;/code&gt;에서 바로 생성도 가능합니다. 파라미터들만 잘 설정해주면 됩니다.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;|   1  2  3  4  5     |   D = np.abs(librosa.stft(y, n_fft=n_fft, win_length = win_length, hop_length=hop_length))  mel_spec = librosa.feature.melspectrogram(S=D, sr=sr, n_mels=n_mels, hop_length=hop_length, win_length=win_length)  librosa.display.specshow(librosa.amplitude_to_db(mel_spec, ref=0.00002), sr=sr, hop_length = hop_length, y_axis=‘mel’, x_axis=‘time’, cmap = cm.jet)  plt.colorbar(format=‘%2.0f dB’)  plt.show()  &lt;a href=&quot;http://colorscripter.com/info#e&quot;&gt;Colored by Color Scripter&lt;/a&gt;   | &lt;a href=&quot;http://colorscripter.com/info#e&quot;&gt;cs&lt;/a&gt; |
+| — | — | — |&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&quot;mfcc-생성-mel-frequency-cepstral-coefficient&quot;&gt;MFCC 생성 (Mel Frequency Cepstral Coefficient)&lt;/h2&gt;
+
+&lt;p&gt;MFCC는 Mel spectrogram에 DCT를 거쳐서 나온 결과값입니다. 스펙트로그램 대비 압축된 정보를 담고 있다고 볼 수 있으며, 압축하는 과정에서 손실이 발생, 노이즈가 제거되는 효과가 있습니다. 이 때문에 MFCC 값이 고유의 음성 정보를 담고 있다고 보기도 하는 것 같습니다. 주로 음성 데이터 분석을 할 때도 MFCC로 하는 것으로 알고 있습니다. 역변환을 하면 원본 파형데이터인 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;y&lt;/code&gt;의 형태로도 연산이 가능하기 때문입니다.&lt;/p&gt;
+
+&lt;p&gt;파라미터는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;n_mfcc&lt;/code&gt;가 있으며, 압축을 얼마나 할지에 대한 것입니다. 크면 클수록 스펙트로그램의 값을 더 잘 담아내며, 작을수록 손실이 많이 발생합니다. &lt;a href=&quot;https://dev-cock.tistory.com/7&quot;&gt;관련 포스팅&lt;/a&gt; 참고.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;|   1  2     |   D = np.abs(librosa.stft(y, n_fft=n_fft, win_length = win_length, hop_length=hop_length))  mfcc = librosa.feature.mfcc(S=librosa.power_to_db(D), sr=sr, n_mfcc=n_mfcc)     | &lt;a href=&quot;http://colorscripter.com/info#e&quot;&gt;cs&lt;/a&gt; |
+| — | — | — |&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&quot;역변환-하는-방법&quot;&gt;역변환 하는 방법&lt;/h2&gt;
+
+&lt;p&gt;위에서 설명한 모든 방법은 역변환을 할 수 있습니다. 아래와 같이 Librosa에서 메소드들을 제공하며, 단계 순서에 관계없이도 역변환이 가능하기 때문에 파라미터 설정만 잘 맞춰주시면 됩니다.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;|   1  2  3  4  5     |   feature.inverse.mel_to_stft(params)  feature.inverse.mel_to_audio(params)  feature.inverse.mfcc_to_mel(params)  feature.inverse.mfcc_to_audio(params)   &lt;a href=&quot;http://colorscripter.com/info#e&quot;&gt;Colored by Color Scripter&lt;/a&gt;   | &lt;a href=&quot;http://colorscripter.com/info#e&quot;&gt;cs&lt;/a&gt; |
+| — | — | — |&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&quot;역변환-시-다시-오디오-파형으로-그리는-방법&quot;&gt;역변환 시 다시 오디오 파형으로 그리는 방법?&lt;/h2&gt;
+
+&lt;p&gt;음원을 주파수 분석하기 위해 FFT를 하는 것을 STFT로 진행한다고 위에서 언급했습니다. 보통 푸리에 변환은 역변환이 가능하기 때문에 바로 다시 음원으로 변형도 가능합니다만, 위 예제의 경우 보시다시피 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;np.abs()&lt;/code&gt;, 즉 절대값을 취하는 과정을 거쳐서 스펙트로그램을 만들었기 때문에 역변환이 불가능합니다.&lt;/p&gt;
+
+&lt;h3 id=&quot;why&quot;&gt;Why?&lt;/h3&gt;
+
+&lt;p&gt;푸리에 변환의 결과값이 위상값을 포함한 복소수로 이루어져 있기 때문입니다. 즉, STFT의 원본 결과값을 출력해보면 복소수 형태로 위상값을 포함하고 있다는 것을 알 수 있습니다. 그런데 abs로 절대화시키는 순간, 위상 정보를 잃게 됩니다.&lt;br /&gt;
+때문에 이런 스펙트로그램에서 파형으로 다시 가기 위해서는 위상을 만드는 과정이 필요하게 됩니다.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&quot;griffin-lim&quot;&gt;Griffin-Lim&lt;/h3&gt;
+
+&lt;p&gt;다양한 방식들이 있지만, librosa에서 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;griffin-lim&lt;/code&gt;이라는 방식을 제공하고 있습니다. 자세히 읽어보진 않았지만, iterative한 방식으로 위상값을 유추해내는 기법이라고 합니다. 원본 데이터의 위상과 정확히 일치하진 않더라도 이런 방식을 통해 오디오 파형으로 역변환이 가능합니다. 또 역변환된 음원과 원본 음원을 함께 들어보면 큰 차이가 나지는 않는 것 같습니다. 어차피 FFT의 결과값이 주기가 다른 sin들이기 때문이 아닐까 싶습니다. 주기가 다르기 때문에 위상이 차이가 나더라도, 그 안에서 상쇄되지는 않는 것 같습니다만! 혹시 차이가 발생하는 부분들이 있다면 댓글로 남겨주시면 감사하겠습니다.&lt;/p&gt;
+</description>
+        <pubDate>Tue, 20 Dec 2022 04:20:00 +0900</pubDate>
+        <link>http://localhost:4000/timeseries/librosa/audiodata/2022/12/20/librosa5.html</link>
+        <guid isPermaLink="true">http://localhost:4000/timeseries/librosa/audiodata/2022/12/20/librosa5.html</guid>
+        
+        
+        <category>TimeSeries</category>
+        
+        <category>Librosa</category>
+        
+        <category>AudioData</category>
+        
+      </item>
+    
+      <item>
+        <title>Python 음성데이터 분석 - MFCC (Mel Frequency Cepstral Coefficient)</title>
+        <description>&lt;p&gt;지난 포스팅까지 소리의 특징부터 주파수 분석 및 Mel Scale까지 다양하게 살펴봤습니다. 이번 포스팅에서는 특히나 음성 분석에 많이 쓰이는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Mel Frequency Cepstral Coefficient&lt;/code&gt;에 대해 알아보겠습니다. 혹시나 잘못된 부분이 있으면 댓글 달아주시면 감사하겠습니다.&lt;/p&gt;
+
+&lt;h2 id=&quot;mfcc-mel-frequency-cepstral-coefficient&quot;&gt;MFCC (Mel Frequency Cepstral Coefficient)&lt;/h2&gt;
+
+&lt;p&gt;mel spectrogram을 DCT(Discrete Cosine Transform) 처리하면 얻게되는 coefficient를 말합니다. 쉽게 얘기하면, mel scale로 변환한 스펙트로그램을 더 적은 값들로 압축하는 과정이라고 볼 수 있습니다. 이미지를 압축하는 과정에서도 DCT를 사용하기도 합니다.&lt;/p&gt;
+
+&lt;h2 id=&quot;dct-discrete-cosine-transform&quot;&gt;DCT (Discrete Cosine Transform)&lt;/h2&gt;
+
+&lt;p&gt;DFT(Fourier) 대비 복소수 없이 실수로만 이루어져 있기 때문에 처리가 빨라 신호처리에서 사용한다고 합니다. 이론에 대한 빠삭한 이해보다는 제가 이해한 방식대로 설명을 해보도록 하겠습니다.&lt;/p&gt;
+
+&lt;p&gt;기본적으로 DCT는 코사인 변환입니다. 즉, 푸리에 변환과 마찬가지로 어떤 그래프(또는 이미지)가 있을 때, 그 그래프를 많은 코사인 함수로 표현한다고 볼 수 있습니다. 예를 들어 Mel-spectrogram에서 주파수 값이 총 1000개 였다면, 이를 그래프화한뒤 다시 주파수 분석을 하는 것입니다.&lt;br /&gt;
+다시 생각해보면, 원래 음원 데이터의 RAW 데이터는 파형이라고 볼 수 있습니다. 이 복잡한 파형을, sr이 22050이라고 한다면, 초당 22050개의 점을 찍어서 만든 아주 거대한 데이터입니다.이를 주파수 분석을 하면 초당 1000개로 표현할 수 있게 됩니다. 즉, 데이터 크기의 압축이 일어나게 되며, 그 과정에서 손실이 발생합니다.&lt;br /&gt;
+여기에서 그 주파수 분석된 결과를 또한번 주파수 분석한다고 이해해볼 수 있겠습니다. 그렇게 되면 원래 초당 22050개의 RAW데이터가 1000개로 축소되었는데, 이를 다시 20개로 축소할 수 있게 되는 것입니다.&lt;/p&gt;
+
+&lt;p&gt;DCT는 inverse 역변환이 가능하기 때문에, 결과적으로 20개의 값을 다시 RAW 데이터인 파형으로 돌릴 수 있습니다. 이렇게 데이터를 압축(손실압축)하는 방식이라고 볼 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Phalaenopsis_fft_dct.png/220px-Phalaenopsis_fft_dct.png&quot; alt=&quot;&quot; /&gt;&lt;br /&gt;
+&lt;em&gt;https://ko.wikipedia.org/wiki/이산\_코사인\_변환&lt;/em&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;그렇게-압축된-데이터가-바로-mfcc-coefficient-입니다&quot;&gt;그렇게 압축된 데이터가 바로 MFCC, coefficient 입니다.&lt;/h2&gt;
+
+&lt;p&gt;제가 이해한 것이 맞다면 원리는 설명한 바와 같습니다. 한번 더 깊게 생각해보면, 주파수 분석을 하게 되면 아주 작은 국소 구간에서의 값 편차는 DCT를 거칠 때 사라지게 될 것입니다. 코사인 함수의 주파수 단위로 분석하기 때문입니다. 이미지로 치면 비슷한 픽셀값들은 모두 동일한 값으로 처리되면서 압축이 될 것이며, 음원의 스펙트로그램으로 치면 비슷한 주파수 영역의 dB값은 모두 동일한 값으로 통일될 겁니다. 그렇게 데이터가 압축되고, 손실이 발생하는 구조입니다.&lt;/p&gt;
+
+&lt;p&gt;이 때 음원의 경우, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;MFCC&lt;/code&gt;를 거치면 노이즈가 제거된다고 볼 수도 있습니다. 사소하게 튀는 값들이 모두 DCT를 거치면서 압축/손실되기 때문입니다.&lt;/p&gt;
+
+&lt;p&gt;이렇게 MFCC를 통해 음원 혹은 음성 데이터의 주요 특징을 추출할 수 있다고 합니다. 추출된 요소가 바로 노이즈가 제거된 음원 데이터의 압축판이라고 볼 수 있지 않나 싶습니다.&lt;/p&gt;
+
+&lt;h2 id=&quot;librosa로-mfcc-구현하기&quot;&gt;Librosa로 MFCC 구현하기&lt;/h2&gt;
+
+&lt;p&gt;Librosa에서는 RAW데이터인 음원을 바로 MFCC로 만들어주기도 하고, 혹은 그 중간과정인 STFT와 Mel-Scale 값을 받아서 만들어주기도 합니다. 기능을 다양하게 제공하니 정말 잘 만든 라이브러리인 것 같습니다.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;D&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;abs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;librosa&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stft&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n_fft&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2048&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;win_length&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2048&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hop_length&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;512&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;mfcc&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;librosa&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;feature&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mfcc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;librosa&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;power_to_db&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;D&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n_mfcc&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://i.stack.imgur.com/nvBcU.png&quot; alt=&quot;&quot; /&gt;&lt;br /&gt;
+&lt;em&gt;https://stackoverflow.com/questions/60492462/mfcc-python-completely-different-result-from-librosa-vs-python-speech-features&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;위와 같은 단순한 형태의 데이터를 얻을 수 있습니다. DCT를 거친 결과이기 때문에, 픽셀 관점이 아니라 주파수 관점에서 접근해야합니다. 즉 보이는 이미지가 특별한 의미가 있다기 보다는, 주파수가 어떻게 분포되는지가 더 중요하다고 볼 수 있는 것 같습니다. (특히 저주파에 대부분 몰려있는 것 같습니다.) 혼동이 되지만, 여기서 얘기하는 주파수는 DCT 결과물에 대한 것이지, 음원 자체의 FFT를 거쳐나온 주파수와는 다른 영역입니다.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&quot;결과적으로&quot;&gt;결과적으로…&lt;/h2&gt;
+
+&lt;p&gt;MFCC를 통해 음성 데이터를 분석하게 되면, 음원보다 상대적으로 갯수가 적은 coefficient들을 학습함으로써 보다 효율적으로 분석을 할 수 있게 됩니다.&lt;br /&gt;
+MFCC의 inverse 메소드들도 librosa에서 제공하고 있기 때문에, 역변환하는 과정만 후처리로 만들어준다면 음성데이터를 분석하는 전체적인 flow는 완성된다고 볼 수 있겠습니다.&lt;/p&gt;
+</description>
+        <pubDate>Tue, 20 Dec 2022 04:00:00 +0900</pubDate>
+        <link>http://localhost:4000/timeseries/librosa/audiodata/2022/12/20/librosa4.html</link>
+        <guid isPermaLink="true">http://localhost:4000/timeseries/librosa/audiodata/2022/12/20/librosa4.html</guid>
+        
+        
+        <category>TimeSeries</category>
+        
+        <category>Librosa</category>
+        
+        <category>AudioData</category>
+        
+      </item>
+    
+      <item>
+        <title>Python 음성데이터 분석 - Mel Spectrogram</title>
+        <description>&lt;p&gt;지난 포스팅까지 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Librosa&lt;/code&gt; 라이브러리의 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;short time fourier frequency&lt;/code&gt;에 대한 이론 및 방법에 대해 알아봤습니다. 이번에는 더 나아가, 음성데이터 분석에 주로 쓰이는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mel spectrogram&lt;/code&gt;에 대해 다뤄보겠습니다. 공부한 내용을 바탕으로 작성하기 때문에, 혹시나 잘못된 내용이 있으면 알려주시면 감사하겠습니다.&lt;/p&gt;
+
+&lt;hr /&gt;
+&lt;h2 id=&quot;mel-spectrogram&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Mel-Spectrogram&lt;/code&gt;&lt;/h2&gt;
+
+&lt;p&gt;인간의 귀는 컴퓨터와 달리, 주파수 간 간격이나 소리의 크기 등을 정확하게 판단하지 못합니다. 저주파대역인지, 고주파대역인지에 따라 판단하는 기준?이 달라지기 때문입니다. 예를 들어 사람이 500Hz와 1000Hz 소리는 쉽게 구분할 수 있습니다만, 10000Hz와 10500Hz는 구분하기 어렵습니다. 같은 500Hz 간격인데도 다르게 느껴지는 것입니다.&lt;br /&gt;
+또한, 동일한 세기로 100Hz 소리를 들려줄 때와, 10000Hz 소리를 들려줄 때 사람이 느끼는 세기는 다릅니다. 같은 세기, 즉 같은 Pa 인데도 말입니다. 귀의 구조 때문에 발생하는 차이라고 하는데요.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mel-scale&lt;/code&gt;은 이러한 사람의 귀를 칼라맵인 스펙트로그램에 반영하는 것을 의미합니다. 보통 고주파로 갈수록 사람이 구분하는 주파수 간격이 넓어지는데요. mel scale은 이러한 원리를 이용해서 필터를 이용, 스케일 단위를 변환합니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://k.kakaocdn.net/dn/cyoMFe/btqzhpGOn8a/vqKhwVCm4ULrVg9SuDcwm0/img.png&quot; alt=&quot;&quot; /&gt;&lt;br /&gt;
+&lt;em&gt;https://en.wikipedia.org/wiki/Mel_scale&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://wikimedia.org/api/rest_v1/media/math/render/svg/2e8a48e66fa73f33901e824ceb1ad6009007ffda&quot; alt=&quot;&quot; /&gt;&lt;br /&gt;
+&lt;em&gt;https://en.wikipedia.org/wiki/Mel_scale&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;위 그림에서 보다시피, 주파수 대역별 mel 값으로 변환이 가능합니다. 즉, 지난 포스팅에서 stft가 linear한 Hz 해상도로 표현이 된다면, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mel-scale&lt;/code&gt;은 관계가 공식과 같이 되는 것입니다. 칼라맵으로 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mel&lt;/code&gt; 단위로 표현하면 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;stft&lt;/code&gt;와 차이가 발생하는 것을 볼 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;stft&lt;/code&gt;에 아래와 같은 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mel-filter bank&lt;/code&gt;를 통과시키는 방식으로 만들 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://k.kakaocdn.net/dn/c8yJD2/btqAgUMseFo/cDU73LJA5VNkLGxgeScyr0/img.png&quot; alt=&quot;&quot; /&gt;&lt;br /&gt;
+&lt;em&gt;https://towardsdatascience.com/getting-to-know-the-mel-spectrogram-31bca3e2d9d0&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;고주파로 갈수록 같은 mel 값을 가지는 주파수 범위가 넓어지는 것을 볼 수 있습니다.&lt;/p&gt;
+
+&lt;h2 id=&quot;librosa를-이용해-스펙트로그램-생성&quot;&gt;Librosa를 이용해 스펙트로그램 생성&lt;/h2&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;n_fft&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2048&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;win_length&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2048&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;hop_length&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1024&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;n_mels&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;128&lt;/span&gt;
+ 
+&lt;span class=&quot;n&quot;&gt;D&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;abs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;librosa&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stft&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n_fft&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n_fft&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;win_length&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;win_length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hop_length&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hop_length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;mel_spec&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;librosa&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;feature&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;melspectrogram&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;D&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n_mels&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n_mels&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hop_length&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hop_length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;win_length&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;win_length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;librosa&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;specshow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;librosa&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;amplitude_to_db&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mel_spec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ref&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.00002&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hop_length&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hop_length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y_axis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;mel&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x_axis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;time&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cmap&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;jet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;colorbar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;%2.0f dB&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;간단하게 mel spectrogram을 구현할 수 있습니다. 이 때, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;n_mels&lt;/code&gt;가 곧 칼라맵의 주파수 해상도가 됩니다. 즉, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mel&lt;/code&gt; 기준으로 몇개의 값으로 표현할지를 나타내는 변수입니다. 많으면 많을수록 원래 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;stft&lt;/code&gt;로 표현한 칼라맵과 유사한 형태가 됩니다. 그만큼 필터를 촘촘하게 쓰는 것 같습니다.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&quot;decibel-weighting-a-b-c-&quot;&gt;Decibel Weighting (A, B, C… )&lt;/h2&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mel scale&lt;/code&gt;과 유사한 방식이 또 있습니다. decibel weighting입니다. 주파수에 따라 사람이 동일한 세기로 느껴지는 정도에 맞게 데시벨을 후보정해주는 것이라고 볼 수 있습니다. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mel&lt;/code&gt; 방식은 주파수 해상도와 관련이 있었다면, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;decibel weighting&lt;/code&gt;은 해상도라기 보다는 주파수 세기와 관련이 있는 것 같습니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://www.engineeringtoolbox.com/docs/documents/59/SoundDecibelABC.gif&quot; alt=&quot;&quot; /&gt;&lt;br /&gt;
+&lt;em&gt;https://www.engineeringtoolbox.com/decibel-d\_59.html&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;주파수에 따라 각 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;weighting&lt;/code&gt;별로 그래프 수치만큼 합산해줍니다. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;librosa&lt;/code&gt;에는 다음과 같은 함수를 제공합니다.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;freqs&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;librosa&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cqt_frequencies&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;108&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;librosa&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;note_to_hz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;C1&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;aw&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;librosa&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A_weighting&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;freqs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;plot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;freqs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;aw&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xlabel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;Frequency (Hz)&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ylabel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;Weighting (log10)&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;A-Weighting of CQT frequencies&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;B나 C 웨이팅은 기본 함수로는 제공하지 않는 것 같네요.&lt;/p&gt;
+
+&lt;p&gt;다음 포스팅에서는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Mel Frequency Cepstral Coefficient&lt;/code&gt;를 생성하는 방법 및 이론에 대해 알아보겠습니다.&lt;/p&gt;
+</description>
+        <pubDate>Tue, 20 Dec 2022 03:40:00 +0900</pubDate>
+        <link>http://localhost:4000/timeseries/librosa/audiodata/2022/12/20/librosa3.html</link>
+        <guid isPermaLink="true">http://localhost:4000/timeseries/librosa/audiodata/2022/12/20/librosa3.html</guid>
+        
+        
+        <category>TimeSeries</category>
+        
+        <category>Librosa</category>
+        
+        <category>AudioData</category>
+        
+      </item>
+    
+      <item>
+        <title>Python 음성데이터 분석 - Librosa 라이브러리를 활용한 주파수 분석</title>
+        <description>&lt;p&gt;이번 포스팅에서는 지난 포스팅에 이어, 실제로 파이썬을 이용해 어떻게 음성 데이터를 불러오고 가공하는지에 대해 알아보겠습니다.&lt;/p&gt;
+
+&lt;p&gt;파이썬은 배워두면 참 쓸모가 많은 언어인 것 같습니다. 찾아보면 어지간한 라이브러리가 다 있으니까요. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Librosa&lt;/code&gt; 라이브러리는 음성 데이터를 다루는 대표적인 라이브러리입니다. 간단하게 wav파일을 불러와서 파형을 직접 가공할 수도 있고, FFT나 MFCC 등 다양한 형태로 변환하는 기능들도 제공합니다. 상세히 살펴보겠습니다.&lt;/p&gt;
+
+&lt;h2 id=&quot;음원-데이터-불러오기&quot;&gt;음원 데이터 불러오기&lt;/h2&gt;
+
+&lt;p&gt;아래와 같이 wav 파일을 불러올 수 있습니다.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;librosa&lt;/span&gt;  
+&lt;span class=&quot;n&quot;&gt;audio_path&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;waveFile.wav&apos;&lt;/span&gt;  
+&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sr&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;librosa&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;audio_path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;y&lt;/code&gt;: 파형의 amplitude 값&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sr&lt;/code&gt;: sampling rate&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;y의 그래프를 그려보면, wav파일에 담긴 파형 자체의 그래프가 나오게 됩니다. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sr&lt;/code&gt;은 오디오 파일에 맞게 설정할 수 있으며, 설정하지 않으면 기본값인 22050으로 파형을 그리게 됩니다.&lt;/p&gt;
+
+&lt;center&gt;
+&lt;img src=&quot;https://i.stack.imgur.com/L78i0.png&quot; /&gt;
+&lt;em&gt;https://stackoverflow.com/questions/41606185/audio-waveform-matching&lt;/em&gt;
+&lt;/center&gt;
+
+&lt;p&gt;지난 포스팅에서 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nyquist frequency&lt;/code&gt;에 대해 간단히 다뤘었는데, 나이퀴스트 주파수는 그 절반값인 11025Hz가 됩니다. 즉, 이 파형을 주파수 분석(FFT)할 때 나올 수 있는 최대 주파수가 11025Hz가 됩니다. 그 이상의 주파수까지 분석이 필요할 경우, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sr&lt;/code&gt;을 더 올려서 음원데이터를 불러오시면 됩니다.&lt;/p&gt;
+
+&lt;h2 id=&quot;주파수-분석&quot;&gt;주파수 분석&lt;/h2&gt;
+
+&lt;p&gt;소리는 기본적으로 특정 주파수를 가지는 sin함수들의 합이라고 했습니다. 즉, 위에서 구한 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;y&lt;/code&gt;파형을 주파수 분석을 통해, 특정 시간에 주파수 성분이 어떻게 구성되어 있는지 확인할 수 있는데요. 음성 데이터 분석을 할 때 주파수 분석 기법을 많이 사용합니다. (파형 자체를 이용하기도 합니다!) 주파수 분석은 크게 3단계로 이루어지는데, 이번 포스팅에서는 그 중에서도 Fourier Transform에 대해서만 간단히 다뤄보겠습니다.&lt;/p&gt;
+
+&lt;h3 id=&quot;fourier-transform-time-domain의-그래프를-frequency-domain으로-변환시켜주는-작업&quot;&gt;Fourier Transform: time-domain의 그래프를 frequency-domain으로 변환시켜주는 작업&lt;/h3&gt;
+
+&lt;center&gt;
+&lt;img src=&quot;https://upload.wikimedia.org/wikipedia/commons/7/72/Fourier_transform_time_and_frequency_domains_%28small%29.gif&quot; /&gt;
+&lt;em&gt;https://upload.wikimedia.org/wikipedia/commons/7/72/Fourier\_transform\_time\_and\_frequency\_domains\_%28small%29.gif&lt;/em&gt;
+&lt;/center&gt;
+
+&lt;p&gt;그림으로 이해하는 것이 좋습니다. 빨간 곡선이 있었을 때, 이것을 푸리에 변환을 거치게 되면 다양한 주파수와 위상을 가지는 sin함수들로 변환시키게 됩니다. 각 sin함수는 주파수와 위상이 정해져 있고, 이를 x축이 frequency, y축이 amplitude로 나타낼 수 있습니다. 핵심은, 어떤 파형이든지 간에, sin함수들로 쪼갤 수 있다는 점입니다. 수 많은 다양한 sin함수의 조합으로 모든 곡선을 만들 수 있다고 봐도 괜찮을 것 같습니다.&lt;/p&gt;
+
+&lt;p&gt;이제 해야할 일은, 분석하고자 하는 음원 데이터를 특정 시간 간격으로 쪼갠 뒤, 해당 간격에 있는 파형에 대해 퓨리에 변환을 적용함으로써 주파수 분석을 하는 것입니다. 원하는 아웃풋 형태는 다음과 같습니다.&lt;/p&gt;
+
+&lt;center&gt;
+&lt;img src=&quot;https://bastibe.de/static/2019-09/stft.png&quot; /&gt;
+&lt;em&gt;https://bastibe.de/static/2019-09/stft.png&lt;/em&gt;
+&lt;/center&gt;
+
+&lt;p&gt;보시는 것처럼 음원 파형이 있을 때, 이를 작은 시간 간격으로 쪼갠 뒤 푸리에 변환을 하게 되면 칼라맵이 나오게 됩니다. x축은 시간, y축은 Hz, 색상은 dB를 나타냅니다. 이런 일종의 이미지화된 어레이를 통해 데이터를 분석할 수 있게 됩니다. 이런 이미지, 칼라맵들은 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Short Time Fourier Transform (STFT)&lt;/code&gt;을 통해 만들 수 있습니다.&lt;/p&gt;
+
+&lt;h2 id=&quot;short-time-fourier-transform&quot;&gt;Short Time Fourier Transform&lt;/h2&gt;
+
+&lt;p&gt;위에서 설명한 방법과 동일합니다. 음원을 특정 시간 주기로 쪼갠 뒤, 해당 주기별로 Fourier Transform을 진행하면, 해당 주기만큼 주파수 분석 그래프를 얻게 됩니다. 이를 다시 시간 단위로 배열하면, 3차원 칼라맵이 나오게 되는데요. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Librosa&lt;/code&gt; 라이브러리에서 제공하는 메소드가 있습니다. 상세 내용은 &lt;a href=&quot;http://man.hubwiz.com/docset/LibROSA.docset/Contents/Resources/Documents/generated/librosa.core.stft.html&quot;&gt;여기&lt;/a&gt;에서 확인하실 수 있습니다.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;stft_result&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;librosa&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stft&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n_fft&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;4096&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;win_length&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4096&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hop_length&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1024&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;D&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;abs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stft_result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;S_dB&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;librosa&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;power_to_db&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;D&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ref&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;librosa&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;specshow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S_dB&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hop_length&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1024&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y_axis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;linear&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x_axis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;time&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cmap&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;jet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;colorbar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;%2.0f dB&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;실행하시면 칼라맵이 생성되는 것을 확인하실 수 있습니다. 주목해야 할 점들은 parameter들입니다. 크게 아래 3가지 설정값이 있습니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;win_length&lt;/li&gt;
+  &lt;li&gt;hop_length&lt;/li&gt;
+  &lt;li&gt;n_fft&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;짧은 시간 주기로 쪼갠 뒤, 퓨리에 변환을 한다고 서술했는데요. 이 때 사용하는 방식이 FFT 방식입니다. Fast Fourier Transform의 약자이며, 그냥 빠르게 변환하는 방식이라고 볼 수 있겠습니다.&lt;br /&gt;
+이 때 변환하는 방식을 보면 다음 그림과 같습니다.&lt;/p&gt;
+
+&lt;center&gt;
+&lt;img src=&quot;https://kr.mathworks.com/help/dsp/ref/stft_output.png&quot; /&gt;
+&lt;em&gt;https://kr.mathworks.com/help/dsp/ref/dsp.stft.html&lt;/em&gt;
+&lt;/center&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;win_length&lt;/code&gt;는 FFT를 할 때 참조할 그래프의 길이입니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;hop_length&lt;/code&gt;는 얼마만큼 시간 주기를 이동하면서 분석을 할 것인지에 대한 파라미터입니다. 즉, 칼라맵의 시간 주기라고 볼 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;n_fft&lt;/code&gt;는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;win_length&lt;/code&gt;보다 길 경우 모두 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;zero padding&lt;/code&gt;해서 처리하기 위한 파라미터입니다. default는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;win_length&lt;/code&gt;와 같습니다.&lt;/p&gt;
+
+&lt;p&gt;이런 파라미터들이 있는 이유는…&lt;br /&gt;
+단순하게 생각해봤을 때, 분석하는 시간이 길수록 주파수를 더 잘 분석합니다. 그 만큼 데이터가 많으니까요. 대신 시간이 길어진다는 건, 시간 해상도는 떨어진다는 의미가 됩니다. 일종의 tradeoff 관계가 있기 때문에 보통 STFT를 수행할 때는 파라미터 설정을 통해 최적화하는 과정을 거치게 됩니다.&lt;/p&gt;
+
+&lt;p&gt;위 파라미터들을 보시면 이제 조금 이해가 가시나요? win_length는 FFT를 수행할 시간 간격이고, hop_length는 시간 해상도를 나타내는 값입니다. 이렇게 되면 약간의 overlap이 발생하게 됩니다. hop_length 이후의 시간 단위들에 해당하는 주파수까지 포함하게 된다는 의미입니다. 그럼에도 이렇게 사용하는 건 이점이 있기 때문일겁니다. (더 상세히는 잘 모르겠군요..)&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;n_fft&lt;/code&gt;는 얘기가 약간 다릅니다. 아래 그림을 보면서 설명하겠습니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://www.bitweenie.com/wp-content/uploads/2013/04/td-cos-plot.jpg&quot; alt=&quot;&quot; /&gt;.&lt;br /&gt;
+&lt;em&gt;https://www.bitweenie.com/listings/fft-zero-padding/&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://www.bitweenie.com/wp-content/uploads/2013/04/fd-1000pt-1000fft.jpg&quot; alt=&quot;&quot; /&gt; &lt;br /&gt;
+&lt;em&gt;https://www.bitweenie.com/listings/fft-zero-padding/&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;위와 같은 신호를 FFT 분석을 하게 되면, 다음과 같이 나오게 됩니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://www.bitweenie.com/wp-content/uploads/2013/04/td-7000ptzp-7000fft.jpg&quot; alt=&quot;&quot; /&gt;&lt;br /&gt;
+&lt;em&gt;https://www.bitweenie.com/listings/fft-zero-padding/&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;어떻게 보면 제대로 분석한 것처럼 보이는데요. 만약 다음과 같이 기본 음원파형에 zero를 이어 붙여서 시간 간격을 늘리면 어떻게 될까요?&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://www.bitweenie.com/wp-content/uploads/2013/04/fd-7000ptzp-7000fft.jpg&quot; alt=&quot;&quot; /&gt;&lt;br /&gt;
+&lt;em&gt;https://www.bitweenie.com/listings/fft-zero-padding/&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;시간 간격을 늘린다는 것은, 주파수 해상도를 높이는 것이라고 위에서 언급했습니다. FFT한 결과는 다음과 같습니다.&lt;/p&gt;
+
+&lt;p&gt;원래의 FFT보다 더 섬세하게 주파수 분석을 한 것을 볼 수 있습니다. 이렇게 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;zero padding&lt;/code&gt;을 하면 주파수 해상도를 올릴 수 있습니다.&lt;br /&gt;
+&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;n_fft&lt;/code&gt;가 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;win_length&lt;/code&gt;보다 클 경우, 큰 구간은 모두 zero padding으로 채우게 됩니다. 이유는 설명드린바와 같이, 주파수 해상도를 높이기 위해서입니다.&lt;/p&gt;
+
+&lt;p&gt;사실 설명안한 파라미터 중 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;window&lt;/code&gt; 도 있습니다. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;STFT&lt;/code&gt; 라이브러리에서 default 값은 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;hann&lt;/code&gt;으로 되어 있는데요.&lt;br /&gt;
+FFT를 할 때 특정 주기 간격으로 한다고 말씀드렸는데, 그 주기가 무한번 반복한다는 가정하에 계산이 이뤄지게 됩니다. 그렇다면 다음과 같이 파형이 생겼을 경우, 연결되는 부분에서 문제가 발생하게 됩니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://www.tek.com/-/media/sites/default/files/u811871/discontinuity.png&quot; alt=&quot;&quot; /&gt; &lt;br /&gt;
+&lt;em&gt;https://www.tek.com/blog/window-functions-spectrum-analyzers&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://www.tek.com/-/media/sites/default/files/u811871/rectangle-f.png&quot; alt=&quot;&quot; /&gt;  &lt;br /&gt;
+&lt;em&gt;https://www.tek.com/blog/window-functions-spectrum-analyzers&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;매끄럽지 않은 부분들까지 포함해서 주파수 분석을 하기 때문에, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;spectral leakage&lt;/code&gt;가 발생하게 됩니다.&lt;/p&gt;
+
+&lt;p&gt;위 그림은 leakage가 발생한 그림이고, 이상적으로는 아래와 같이 나왔어야 합니다. (단일 주파수를 가진 sin함수일 때)&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://www.tek.com/-/media/sites/default/files/u811871/fft-sine.png&quot; alt=&quot;&quot; /&gt;&lt;br /&gt;
+&lt;em&gt;https://www.tek.com/blog/window-functions-spectrum-analyzers&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;즉 같은 sin함수라도, 구간을 어떻게 정의하느냐에 따라 주파수 spectral에 leakage가 발생하는 것입니다. 이러한 discontinuity 문제를 해결하기 위한 것이 바로 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;window&lt;/code&gt; 입니다. 대표적으로 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;hanning&lt;/code&gt;과 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;hamming&lt;/code&gt;이 있습니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://www.tek.com/-/media/sites/default/files/u811871/hamming-t.png&quot; alt=&quot;&quot; /&gt;&lt;br /&gt;
+&lt;em&gt;https://www.tek.com/blog/window-functions-spectrum-analyzers&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;그림처럼 일종의 필터링을 하는 것입니다. hanning의 경우, 그래프 구간의 양 끝을 0으로 맞춤으로써, periodic 상황에서의 discontinuity를 없애는 방식입니다. 이런식으로 핕터링을 하게 되면, 주파수 분석 결과는 다음과 같습니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://www.tek.com/-/media/sites/default/files/u811871/hamming-f.png&quot; alt=&quot;&quot; /&gt; &lt;br /&gt;
+&lt;em&gt;https://www.tek.com/blog/window-functions-spectrum-analyzers&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;데이터에 따라 다양한 윈도우를 적용할 수 있습니다.&lt;br /&gt;
+&lt;a href=&quot;https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.get_window.html#scipy.signal.get_window&quot;&gt;여기&lt;/a&gt;에서 사용가능한 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;window&lt;/code&gt; 리스트를 볼 수 있습니다.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;간단하게 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;STFT&lt;/code&gt;와 그 parameter 들에 대해 살펴보았습니다. 다음 포스팅에서는 핫한 음성 머신러닝 시 주로 활용하는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mel scale&lt;/code&gt; 및 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mel frequency&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mel frequency cepstral coefficient&lt;/code&gt;등에 대해 알아보겠습니다.&lt;/p&gt;
+</description>
+        <pubDate>Mon, 19 Dec 2022 03:40:00 +0900</pubDate>
+        <link>http://localhost:4000/timeseries/librosa/audiodata/2022/12/19/librosa2.html</link>
+        <guid isPermaLink="true">http://localhost:4000/timeseries/librosa/audiodata/2022/12/19/librosa2.html</guid>
+        
+        
+        <category>TimeSeries</category>
+        
+        <category>Librosa</category>
+        
+        <category>AudioData</category>
+        
+      </item>
+    
+      <item>
+        <title>Python 음성데이터 분석 - 음성 데이터 형태</title>
+        <description>&lt;p&gt;시작하기에 앞서…&lt;br /&gt;
+본 포스팅은 과거에 운영하던 블로그에서 일부 수정하여 발췌해왔음을 서두에 밝힙니다.&lt;/p&gt;
+
+&lt;p&gt;이번에는 음성 데이터를 분석하는 방법에 대해 다뤄보겠습니다. 아직 공부중이긴 합니다만, 지금까지 진행한 내역들에 대해 초심자의 마음으로 서술하고자 합니다. 혹시 잘못된 내용이 있으면 댓글로 알려주시면 감사하겠습니다.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&quot;음성-소리의-형태&quot;&gt;음성, 소리의 형태&lt;/h2&gt;
+
+&lt;p&gt;우리가 듣는 소리는 진동의 형태라고도 볼 수 있습니다. 공기 중의 진동을 통해 파형이 전달되면서, 그 파형을 귀에서 인지해서 소리를 듣는 것입니다. 인간이 들을 수 있는 최소 압력단위인 20uPa 부터 그 위로 다양한 소리의 세기들이 결정됩니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://www.physicsclassroom.com/Class/sound/u11l1c1.gif&quot; alt=&quot;&quot; /&gt;&lt;br /&gt;
+&lt;em&gt;http://www.physicsclassroom.com/Class/sound&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;진동의 형태는 주파수와 밀접한 관련이 있습니다. 주로 중고등학교때부터 배워온 sin, cos 함수 등으로 진동이 표현된다고 볼 수 있겠습니다. 예를 들어 피아노의 경우, 특정 주파수를 가지는 ‘도’와 ‘미’를 연주했을 때, 우리는 두 음이 중첩된 소리를 들을 수 있습니다. 이는 각각의 음에 해당하는 sin 함수들이 더해진 파동의 형태가 귀에 전달된다고 볼 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://www.physicsclassroom.com/Class/sound/u11l1c2.gif&quot; alt=&quot;&quot; /&gt;&lt;br /&gt;
+&lt;em&gt;http://www.physicsclassroom.com/Class/sound&lt;/em&gt;
+&amp;lt;/center&amp;gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;음성-데이터란&quot;&gt;음성 데이터란?&lt;/h2&gt;
+
+&lt;p&gt;보통 우리는 컴퓨터에 음성데이터를 가지고 있습니다. wav파일이나 mp3 파일 등 익숙한 형태로 저장되어 있는데요. 이런 음성 데이터들이 어디서부터 오는지 생각해보면, 아마도 대체로 녹음실일겁니다. 실제 사람의 목소리나 악기들의 연주가 마이크를 통해 전기 신호로 변환되고, 이 전기 신호를 다시 컴퓨터에 저장하는 것입니다. 즉, 위에서 언급한 복잡한 sin 함수들의 합성함수가 컴퓨터에 그려지는 과정을 통해 데이터가 저장됩니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://www.mediacollege.com/audio/images/mic-diaphragm.gif&quot; alt=&quot;&quot; /&gt;&lt;br /&gt;
+&lt;em&gt;https://www.mediacollege.com/audio/microphones/how-microphones-work.html&lt;/em&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;아날로그에서-디지털로-변환되는-음성-신호&quot;&gt;아날로그에서 디지털로 변환되는 음성 신호&lt;/h2&gt;
+
+&lt;p&gt;디지털로 변환된 데이터는 아날로그에 비해 한계가 있습니다. 컴퓨터는 특정 주기로 연산을 하기 때문에, 오리지날 신호 그 자체를 저장할 수 없기 때문인데요. 아래 그림을 보시면 이해가 될 것입니다. 부드러운 실제 우리가 듣는 아날로그 신호를 저장할 때, 컴퓨터는 특정 주기로 점을 찍는 방식으로 데이터를 저장하게 됩니다. 즉, 점 찍는 주기가 얼마나 빠르냐에 따라 아날로그 신호를 더 잘 저장할 수 있게 되는 것입니다. 이를 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sampling rate&lt;/code&gt;이라고 하며, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;descrete signal processing&lt;/code&gt;에 자주 나오는 용어입니다. (사실 너무나 유명한 용어라..)&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Signal_Sampling.png/300px-Signal_Sampling.png&quot; alt=&quot;&quot; /&gt; &lt;br /&gt;
+&lt;em&gt;https://en.wikipedia.org/wiki/Sampling&lt;/em&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;nyquist-frequency는-sampling-rate의-반-값에-해당하는-주파수입니다&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nyquist frequency&lt;/code&gt;는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sampling rate&lt;/code&gt;의 반 값에 해당하는 주파수입니다.&lt;/h2&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nyquist frequency&lt;/code&gt;를 아는 것이 중요합니다. 예를 들어 아주 고주파(ex. 10kHz)까지 합성된 sin 합성 함수가 있다고 합시다. 이 때, 충분히 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sampling rate&lt;/code&gt;을 작게, 즉 점을 더 많이 찍지 않으면 아주 고주파 영역은 디지털화하지 못하게 됩니다. 아래 그림을 보시면 됩니다. 아주~ 고주파의 경우, 점 찍는 주기보다 작아지기 때문에 그 점들로 표현할 수가 없게 되는 것입니다. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nyquist frequeny&lt;/code&gt;는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sampling rate&lt;/code&gt;이 정해져 있을 때 어느정도까지 주파수 해상도가 나오는지를 결정하는 값이라고 볼 수 있겠습니다. 파이썬의 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;librosa&lt;/code&gt; 라이브러리를 통해 이 과정에 어떻게 표현되는지 추후 알아보겠습니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://www.researchgate.net/profile/John_Crassidis/publication/268059472/figure/fig2/AS:669512223449103@1536635561587/Sampling-Frequency-Less-Than-Twice-the-Nyquist-Frequency.png&quot; alt=&quot;&quot; /&gt;&lt;br /&gt;
+&lt;em&gt;https://www.researchgate.net/figure/Sampling-Frequency-Less-Than-Twice-the-Nyquist-Frequency_fig2_268059472&lt;/em&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;소리와 데이터 형태에 대해 간단히 알아봤습니다. 다음 포스팅에서는 파이썬을 이용해 음원 데이터를 불러오고 살펴보는 방법에 대해 알아보겠습니다.&lt;/p&gt;
+</description>
+        <pubDate>Sun, 18 Dec 2022 03:40:00 +0900</pubDate>
+        <link>http://localhost:4000/timeseries/librosa/audiodata/2022/12/18/librosa1.html</link>
+        <guid isPermaLink="true">http://localhost:4000/timeseries/librosa/audiodata/2022/12/18/librosa1.html</guid>
+        
+        
+        <category>TimeSeries</category>
+        
+        <category>Librosa</category>
+        
+        <category>AudioData</category>
+        
+      </item>
+    
+      <item>
+        <title>Integrating razorpay into your webapp</title>
+        <description>&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse&lt;/p&gt;
+
+&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;Razorpay&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&apos;&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;razorpay&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+&lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;rzp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;Razorpay&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;
+	&lt;span class=&quot;na&quot;&gt;key_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&apos;&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;KEY_ID&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+	&lt;span class=&quot;na&quot;&gt;secret&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&apos;&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&apos;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// capture request&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;rzp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;capture&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;payment_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;cost&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;then&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+		&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Check out the &lt;a href=&quot;https://jekyllrb.com/docs/home&quot;&gt;Jekyll docs&lt;/a&gt; for more info on how to get the most out of Jekyll. File all bugs/feature requests at &lt;a href=&quot;https://github.com/jekyll/jekyll&quot;&gt;Jekyll’s GitHub repo&lt;/a&gt;. If you have questions, you can ask them on &lt;a href=&quot;https://talk.jekyllrb.com/&quot;&gt;Jekyll Talk&lt;/a&gt;.&lt;/p&gt;
+
+</description>
+        <pubDate>Sun, 24 Mar 2019 00:33:36 +0900</pubDate>
+        <link>http://localhost:4000/javascript/nodejs/2019/03/24/welcome-to-jekyll.html</link>
+        <guid isPermaLink="true">http://localhost:4000/javascript/nodejs/2019/03/24/welcome-to-jekyll.html</guid>
+        
+        
+        <category>Javascript</category>
+        
+        <category>NodeJS</category>
+        
+      </item>
+    
+  </channel>
+</rss>

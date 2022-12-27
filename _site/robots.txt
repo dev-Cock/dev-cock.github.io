@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: http://dev-cock.github.io/sitemap.xml
